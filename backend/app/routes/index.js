@@ -2,10 +2,10 @@ const axios = require('axios');
 const path = require('path');
 var appRoot = require('app-root-path');
 const readFile = require('../../misc/readFile');
-const User = require("./models.js");
-const Products = require("./models.js");
-const Property = require("./models.js");
-const PropertyValues = require("./models.js");
+const User = require("./models/user");
+const Products = require("./models/products");
+const Property = require("./models/property");
+const PropertyValues = require("./models/propertyValues");
 
 const index = async function (app, db) {
 
@@ -51,19 +51,33 @@ const index = async function (app, db) {
         // uuid: string
         // type: string
 
-        const newUser = new User({
-            uuid: req.body.uuid,
-            type: req.body.type
-        });
+        User.find({ uuid : req.body.uuid }, function(err, result) {
 
-        newUser.save(function (err) {
-            if (err) return ;
-            // saved!
+            if (!result.length) {
+                const user = new User({
+                    uuid: req.body.uuid,
+                    password : req.body.password,
+                    type: req.body.type
+                });
+        
+                user.save(function (err) {
+                    if (err) return ;
+                    // saved!
+        
+                    res.json({
+                        "status" : "OK"
+                    });
+                  });
 
-            res.json({
-                "status" : "ok"
-            });
-          });
+            } else {
+
+                res.json({
+                    "status" : "ALREADY_REGISTERED"
+                });
+
+            }
+        })
+
           
 
     });

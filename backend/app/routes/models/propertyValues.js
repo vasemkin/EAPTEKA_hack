@@ -2,32 +2,6 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const user = new Schema(
-  {
-    uuid : { type: String, default: null },
-    type : { type: String, default: null },
-    prescriptions : Array
-  },
-  { collection: "User" }
-);
-
-const products = new Schema(
-  {
-  ID : Number,
-  NAME : { type: String, default: null }
-  },
-  { collection: "Products" }
-)
-
-const property = new Schema(
-  {
-  ID : Number,
-  CODE : { type: String, default: null },
-  NAME : { type: String, default: null }
-  },
-  { collection: "Property" }
-)
-
 const propertyValues = new Schema({
   IBLOCK_ELEMENT_ID: Number,
   PROPERTY_276: { type: String, default: null },
@@ -54,19 +28,6 @@ const propertyValues = new Schema({
   PROPERTY_283: { type: String, default: null }
   },
   { collection: "PropertyValues" }
-)
-
-const prescription = new Schema({
-  drugs : Array,
-  uuid : { type: String, default: null },
-  description : { type: String, default: null },
-  doctor_id : { type: String, default: null } 
-  },
-  { collection : "Prescription" }
 );
 
-module.exports = mongoose.model("User", user);
-module.exports = mongoose.model("Prescription", prescription);
-module.exports = mongoose.model("Products", products);
-module.exports = mongoose.model("Property", property);
 module.exports = mongoose.model("PropertyValues", propertyValues);
