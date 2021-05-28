@@ -1,13 +1,41 @@
 const axios = require('axios');
 const path = require('path');
 var appRoot = require('app-root-path');
+const readFile = require('../../misc/readFile');
 const User = require("./models.js");
+const Products = require("./models.js");
+const Property = require("./models.js");
+const PropertyValues = require("./models.js");
 
 const index = async function (app, db) {
 
     app.get('/api/list_users', (req, res) => {
 
         User.find({}, function(err, result) {
+            if (err) {
+              console.log(err);
+            } else {
+              res.json(result);
+            }
+        });
+
+    });
+
+    app.get('/api/list_products', (req, res) => {
+
+        Products.find({}, function(err, result) {
+            if (err) {
+              console.log(err);
+            } else {
+              res.json(result);
+            }
+        });
+
+    });
+
+    app.get('/api/list_properties', (req, res) => {
+
+        Property.find({}, function(err, result) {
             if (err) {
               console.log(err);
             } else {
