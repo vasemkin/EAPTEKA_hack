@@ -8,6 +8,7 @@ const Products = require("./models/products");
 const Property = require("./models/property");
 const Prescription = require("./models/prescription");
 const PropertyValues = require("./models/propertyValues");
+const PropertyMultipleValues = require("./models/PropertyMultipleValues");
 
 const index = async function (app, db) {
 
@@ -120,14 +121,15 @@ const index = async function (app, db) {
 
                 const user = result[0];
 
-                Prescription.find({ prescription_id : { $all : user.prescriptions }}, function(err, result) {
+                Prescription.find({ prescription_id : { $in : user.prescriptions }}, function(err, prescriptionsResult) {
+
                     if (err) {
                         res.json({
                             "status" : "FAIL"
                         });
                     } else {
                         res.json({
-                            "data" : result
+                            "prescriptions" : prescriptionsResult
                         });
                     }
                 })
@@ -241,6 +243,92 @@ const index = async function (app, db) {
         })
 
     });
+
+    app.get('/api/product_data', (req, res) => {
+
+        Products.find({ ID: req.body.ID }, function(err, result){
+
+            if (err || !result.length) {
+
+                res.json({
+                    "status" : "FAIL"
+                })
+
+            } else { 
+
+                const product = result[0]
+                PropertyMultipleValues.find({ IBLOCK_ELEMENT_ID: product.ID }, function(err, multipleValuesResult) {
+
+                    if (err || !multipleValuesResult.length) {
+
+                        res.json({
+                            "status" : "FAIL"
+                        })
+
+                    } else {
+
+                        const multipleValues = multipleValuesResult[0]
+                        PropertyValues.find({ IBLOCK_ELEMENT_ID: product.ID }, async function(err, valuesResult) {
+
+                            if (err || !valuesResult.length) {
+        
+                                res.json({
+                                    "status" : "FAIL"
+                                })
+        
+                            } else {
+        
+                                const values = valuesResult[0]
+                                let answer = { IBLOCK_ELEMENT_ID : product.ID }
+
+                                const prettify = async () => {
+
+                                    for (let value in values.toObject()) {
+                                        try {
+                                            const search = parseInt(value.split("_")[1])
+                                            await Property.find({ ID : search }, function(err, propertyResult) {
+                                                if(err) return
+    
+                                                try {
+                                                    answer = {
+                                                        ...answer,
+                                                        [propertyResult[0].CODE]: values.toObject()[value]
+                                                    }
+                                                    
+                                                } catch (error) {
+                                                    
+                                                }
+
+                                                console.log(answer)
+                                            })
+                                        } catch (error) {
+                                            
+                                        }
+                                    }
+
+                                }
+
+                                await prettify()
+
+                                res.json({
+                                    product : product,
+                                    multipleValues : multipleValues,
+                                    values : answer
+                                })
+                                
+                            }
+        
+                        })
+
+                    }
+
+                })
+
+            }
+
+        })
+
+    })
       
 
 }
