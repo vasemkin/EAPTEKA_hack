@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Form, Button, Dropdown } from 'semantic-ui-react'
+import { Form, Button, Dropdown, Input } from 'semantic-ui-react'
 import makeid from '../../../misc/makeid'
 import { useDispatch } from 'react-redux'
 import classes from './OneDrug.module.css'
@@ -18,7 +18,11 @@ const OneDrug = (props) => {
     const [dropdownValue, setdropdownValue] = useState({
         id : 0,
         name : '',
-        frequency : ''
+        frequency : '',
+        consumeTime : '',
+        doctor : '',
+        issueDate : '',
+        dueDate : ''
     })
 
     function changeNameID(e, {value}) {
@@ -64,6 +68,62 @@ const OneDrug = (props) => {
                     selection
                     onChange={(e, { value }) => changeFrequency(e, { value })}
                     options={freqs}
+                />
+            </Form.Field>
+            
+            <Form.Field>
+                <label>Время приема</label>
+                <Input 
+                    placeholder='[9, 16]' 
+                    onChange={(e) => {
+                        setdropdownValue({
+                            ...dropdownValue,
+                            consumeTime : e.target.value
+                        })
+                        dispatch(updatePrescribedProduct(props.thisDrug, dropdownValue))
+                    }}
+                />
+            </Form.Field>
+
+            <Form.Field>
+                <label>Лечащий врач</label>
+                <Input 
+                    placeholder='Татьяна Геннадьевна Тарковская' 
+                    onChange={(e) => {
+                        setdropdownValue({
+                            ...dropdownValue,
+                            doctor : e.target.value
+                        })
+                        dispatch(updatePrescribedProduct(props.thisDrug, dropdownValue))
+                    }}
+                />
+            </Form.Field>
+
+            <Form.Field>
+                <label>Дата выдачи</label>
+                <Input 
+                    placeholder='29.05.2021' 
+                    onChange={(e) => {
+                        setdropdownValue({
+                            ...dropdownValue,
+                            issueDate : e.target.value
+                        })
+                        dispatch(updatePrescribedProduct(props.thisDrug, dropdownValue))
+                    }}
+                />
+            </Form.Field>
+
+            <Form.Field>
+                <label>Дата окончания</label>
+                <Input 
+                    placeholder='29.07.2021'
+                    onChange={(e) => {
+                        setdropdownValue({
+                            ...dropdownValue,
+                            dueDate: e.target.value
+                        })
+                        dispatch(updatePrescribedProduct(props.thisDrug, dropdownValue))
+                    }} 
                 />
             </Form.Field>
 
