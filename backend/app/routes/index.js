@@ -98,7 +98,11 @@ const index = async function (app, db) {
                     [...user.prescriptions, 
                         {
                             prescription_id : req.body.prescription_id,
-                            status : "PENDING"
+                            status : "PENDING",
+                            edited : {
+                                isEdited : false,
+                                newData : []
+                            }
                         }
                     ];
 
@@ -235,7 +239,6 @@ const index = async function (app, db) {
         })
 
     });
-    
 
     app.get('/api/get_prescription', (req, res) => {
 
