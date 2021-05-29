@@ -11,15 +11,17 @@ const ProductForm = (props) => {
 
   const addPrescriptionItem = () => {
     const id = makeid(4)
-    dispatch(addPrescribedProduct({ key : id }))
+    dispatch(addPrescribedProduct({ key : id, data : {} }))
   }
 
   return(
     <Form>
+
       <div className={classes.ProductForm__add}>
         <Header as='h4'>Добавить препарат</Header>
         <Button onClick={addPrescriptionItem}>Добавить</Button>
       </div>
+
       {
         props.products.prescribedProducts.map((product) => {
           return (
@@ -27,7 +29,9 @@ const ProductForm = (props) => {
           )
         })
       }
+
       <Button type='submit'>Выписать</Button>
+
     </Form>
   )
 }

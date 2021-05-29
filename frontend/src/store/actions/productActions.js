@@ -1,5 +1,6 @@
 import axios from 'axios'
-import { GET_PRODUCTS , PRODUCTS_FETCHING, ADD_PRESCRIBED_PRODUCT, DELETE_PRESCRIBED_PRODUCT } from './actionTypes'
+import { GET_PRODUCTS , PRODUCTS_FETCHING, 
+        ADD_PRESCRIBED_PRODUCT, DELETE_PRESCRIBED_PRODUCT, UPDATE_PRESCRIBED_PRODUCT } from './actionTypes'
 const { REACT_APP_API_URL } = process.env
 
 export const getProductsCreator = (products) => {
@@ -27,6 +28,16 @@ export const deletePrescribedProduct = (product) => {
     return {
         type: DELETE_PRESCRIBED_PRODUCT,
         payload: product
+    }
+}
+
+export const updatePrescribedProduct = (key, data) => {
+    return {
+        type: UPDATE_PRESCRIBED_PRODUCT,
+        payload: {
+            key : key,
+            data : data
+        }
     }
 }
 

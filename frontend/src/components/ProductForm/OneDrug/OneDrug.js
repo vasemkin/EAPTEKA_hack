@@ -1,13 +1,42 @@
-import React from 'react'
-import ProductChoice from './ProductChoice/ProductChoice'
-import { Form, Button } from 'semantic-ui-react'
+import React, { useState } from 'react'
+import { Form, Button, Dropdown } from 'semantic-ui-react'
+import makeid from '../../../misc/makeid'
 import { useDispatch } from 'react-redux'
-import Consume from './Consume/Consume'
 import classes from './OneDrug.module.css'
-import { deletePrescribedProduct } from '../../../store/actions/productActions'
+import { deletePrescribedProduct, updatePrescribedProduct } from '../../../store/actions/productActions'
+
+const freqs = [
+    { key : `${makeid(4)}`, value : 'ONCE_DAY', text : 'Один раз в день' },
+    { key : `${makeid(4)}`, value : 'TWICE_DAY', text : 'Два раза в день' },
+    { key : `${makeid(4)}`, value : 'ONCE_WEEK', text : 'Один раз в неделю' },
+    { key : `${makeid(4)}`, value : 'TWICE_WEEK', text : 'Два раза в неделю' }
+]
 
 const OneDrug = (props) => {
     const dispatch = useDispatch()
+
+    const [dropdownValue, setdropdownValue] = useState({
+        id : 0,
+        name : '',
+        frequency : ''
+    })
+
+    function changeNameID(e, {value}) {
+        setdropdownValue({
+            ...dropdownValue,
+            id : value,
+            name : e.target.textContent
+        })
+        dispatch(updatePrescribedProduct(props.thisDrug, dropdownValue))
+    }
+
+    function changeFrequency(e, {value}) {
+        setdropdownValue({
+            ...dropdownValue,
+            frequency : value
+        })
+        dispatch(updatePrescribedProduct(props.thisDrug, dropdownValue))
+    }
 
     const removeItem = () => {
         dispatch(deletePrescribedProduct(props.thisDrug))
@@ -17,12 +46,25 @@ const OneDrug = (props) => {
         <div>
             <Form.Field>
                 <label>Препарат</label>
-                <ProductChoice products={props.products} />
+                <Dropdown
+                    placeholder='Препарат'
+                    fluid
+                    search
+                    selection
+                    onChange={(e, { value }) => changeNameID(e, { value })}
+                    options={props.products.products}
+                />
             </Form.Field>
 
             <Form.Field>
                 <label>Частота приема</label>
-                <Consume />
+                <Dropdown
+                    placeholder='Частота приема'
+                    fluid
+                    selection
+                    onChange={(e, { value }) => changeFrequency(e, { value })}
+                    options={freqs}
+                />
             </Form.Field>
 
             <div className={classes.OneDrug__right}>
