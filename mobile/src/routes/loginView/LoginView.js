@@ -1,48 +1,80 @@
 import axios from 'axios';
 
 import * as React from 'react'
-import {Button, Text, View, StyleSheet} from "react-native";
+import {Button, Text, View, StyleSheet, TextInput} from "react-native";
 
-const FB_APP_ID = 'YOUR_APP_ID';
+const URL = 'http://d36062ec5b85.ngrok.io';
 
 export default class LoginView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            result: null
+            result: null,
+            loginInput: '',
+            passwordInput: '',
         }
     }
 
-    _handlePressAsync = () => {
-        const params = {
-            "uuid" : "2ddwss2",
-            "password" : "www"
-        };
-
+    postToServer(action, params) {
         const config = {
             headers: {
                 'Content-Type': 'application/json'
             }
         }
 
-        axios.post('http://82bbf7c3e32d.ngrok.io/api/login', params, config)
+        axios.post(`${URL}/api/${action}`, params, config)
             .then((result) => {
-                console.log('show status',result.data.status)
-                console.log('show type',result.data.type)
+                console.log('show result',result.data)
+                this.setState({result: result.data.status})
             })
             .catch((err) => {
                 console.log(err);
             })
+    }
+    _handlePressSignUp = () => {
+        const params = {
+            "uuid" : this.state.loginInput,
+            "password" : this.state.passwordInput,
+            'type': 'CLIENT'
+        };
+        this.postToServer('register', params)
     };
 
+    _handlePressSignIn = () => {
+        const params = {
+            "uuid" : this.state.loginInput,
+            "password" : this.state.passwordInput,
+        };
+        this.postToServer('login', params)
+    };
+
+    componentDidUpdate() {
+        if (this.state.result === 'SUCCESS') {
+            this.props.navigation.navigate('HomeStack', { screen: 'Reminder' })
+        }
+    }
     render() {
         return (
             <View style={AuthStyle.container}>
-                <Text>Логин</Text>
+                <TextInput
+                    style={AuthStyle.input}
+                    onChangeText={(text) => this.setState({loginInput: text})}
+                    value={this.state.loginInput}
+                />
+                <TextInput
+                    style={AuthStyle.input}
+                    onChangeText={(text) => this.setState({passwordInput: text})}
+                    value={this.state.passwordInput}
+                />
                 <Button
-                    title="Open Auth"
+                    title="Войти"
                     style={AuthStyle.button}
-                    onPress={() => this._handlePressAsync()}
+                    onPress={() => this._handlePressSignIn('login')}
+                />
+                <Button
+                    title="Регистрация"
+                    style={AuthStyle.button}
+                    onPress={() => this._handlePressSignUp('register')}
                 />
                 {this.state.result ? <Text>{JSON.stringify(this.state.result)}</Text> : null}
             </View>
@@ -50,7 +82,7 @@ export default class LoginView extends React.Component {
     }
 }
 
-export const AuthStyle = StyleSheet.create({
+const AuthStyle = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
@@ -61,5 +93,12 @@ export const AuthStyle = StyleSheet.create({
         height: 50,
         backgroundColor: '#2FD566',
         padding: 20
-    }
+    },
+    input: {
+        height: 100,
+        padding: 10,
+        width: 200,
+        margin: 12,
+        borderWidth: 1,
+    },
 });
