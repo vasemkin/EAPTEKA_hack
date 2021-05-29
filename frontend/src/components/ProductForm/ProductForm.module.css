@@ -1,0 +1,5 @@
+.ProductForm__add {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
