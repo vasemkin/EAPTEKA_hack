@@ -7,7 +7,12 @@ const user = new Schema(
       uuid : String,
       password : String,
       type : String,
-      prescriptions : Array
+      prescriptions : [
+        {
+          prescription_id : { type: String, default : null },
+          status : { type: String, default: 'PENDING' }
+        }
+      ]
     },
     { collection: "User" }
   );

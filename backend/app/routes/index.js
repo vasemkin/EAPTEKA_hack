@@ -94,7 +94,13 @@ const index = async function (app, db) {
 
                 const user = result[0];
                 console.log(user);
-                user.prescriptions = [...user.prescriptions, req.body.prescription_id]
+                user.prescriptions = 
+                    [...user.prescriptions, 
+                        {
+                            prescription_id : req.body.prescription_id,
+                            status : "PENDING"
+                        }
+                    ];
 
                 user.save()
 
@@ -107,6 +113,35 @@ const index = async function (app, db) {
 
     });
     
+    app.post('/api/change_prescription_status', (req, res) => {
+
+        User.find({ uuid : req.body.uuid }, function(err, result) {
+
+            if (!result.length) {
+
+                res.json({
+                    "status" : "FAIL"
+                });
+
+            } else {
+
+                const user = result[0];
+                user.prescriptions.forEach((pres, index) => {
+                    if (pres.prescription_id === req.body.prescription_id) {
+                        user.prescriptions[index].status = req.body.status;
+                        user.save()
+                    }
+                })
+
+                res.json({
+                    "status" : "SUCCESS"
+                });
+
+            }
+        })
+
+    })
+
     app.get('/api/user_prescriptions', (req, res) => {
 
         User.find({ uuid : req.body.uuid }, function(err, result) {
@@ -121,7 +156,11 @@ const index = async function (app, db) {
 
                 const user = result[0];
 
-                Prescription.find({ prescription_id : { $in : user.prescriptions }}, function(err, prescriptionsResult) {
+                const whereToLook = user.toObject().prescriptions.map((prescription) => {
+                    return prescription.prescription_id
+                })
+
+                Prescription.find({ prescription_id : { $in : whereToLook }}, function(err, prescriptionsResult) {
 
                     if (err) {
                         res.json({
