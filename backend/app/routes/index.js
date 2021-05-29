@@ -2,9 +2,11 @@ const axios = require('axios');
 const path = require('path');
 var appRoot = require('app-root-path');
 const readFile = require('../../misc/readFile');
+const makeid = require('../../misc/makeid');
 const User = require("./models/user");
 const Products = require("./models/products");
 const Property = require("./models/property");
+const Prescription = require("./models/prescription");
 const PropertyValues = require("./models/propertyValues");
 
 const index = async function (app, db) {
@@ -103,6 +105,57 @@ const index = async function (app, db) {
                     });
 
                 }
+
+            }
+        })
+
+    });
+    
+
+    app.post('/api/generate_prescription', (req, res) => {
+
+        const id = makeid(4)
+
+        console.log(req.body)
+
+        const drugs = new Prescription({
+            id : id,
+            data : req.body
+        });
+
+        console.log(drugs)
+
+        drugs.save(function (err) {
+            if (err) {
+                res.json({
+                    status : "FAIL"
+                })
+            }
+            res.json({
+                status : "SUCCESS",
+                prescription_id : id
+            })
+        })
+
+    });
+    
+
+    app.get('/api/get_prescription', (req, res) => {
+
+        Prescription.find({ prescription_id : req.body.prescription_id }, function(err, result) {
+
+            if (!result.length) {
+
+                res.json({
+                    "status" : "FAIL"
+                });
+
+            } else {
+
+                res.json({
+                    "status" : "SUCCESS",
+                    "data" : result[0]
+                });
 
             }
         })

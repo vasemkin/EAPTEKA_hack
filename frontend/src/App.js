@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react'
-import { Grid, Container, Segment, Card } from 'semantic-ui-react'
+import { Grid, div, Segment, Card } from 'semantic-ui-react'
 import { useDispatch, useSelector } from 'react-redux'
 import ProductForm from './components/ProductForm/ProductForm'
 import { getProducts } from './store/actions/productActions'
+import ReactDOM from "react-dom";
+import QRCode from "react-qr-code";
+import classes from './App.module.css';
 
 function App() {
 
@@ -15,9 +18,9 @@ function App() {
 
   return (
 
-      <Container>
+      <div className={classes.App__seg}>
 
-        <Segment basic>
+        <div className={classes.App__el}>
 
           { products.productsFetching 
           
@@ -32,10 +35,18 @@ function App() {
             </div>    
           }
 
-        </Segment>
+        </div>
+
+        <div className={classes.App__el}>
+          {
+            products.QRValue 
+            ? <QRCode value={products.QRValue}/>
+            : null 
+          }
+        </div>
 
 
-      </Container>
+      </div>
 
   );
 }

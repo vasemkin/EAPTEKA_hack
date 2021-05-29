@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { GET_PRODUCTS , PRODUCTS_FETCHING, 
-        ADD_PRESCRIBED_PRODUCT, DELETE_PRESCRIBED_PRODUCT, UPDATE_PRESCRIBED_PRODUCT } from './actionTypes'
+        ADD_PRESCRIBED_PRODUCT, DELETE_PRESCRIBED_PRODUCT, 
+        UPDATE_PRESCRIBED_PRODUCT, POST_PRESCRIPTION, SET_QR_CODE } from './actionTypes'
 const { REACT_APP_API_URL } = process.env
 
 export const getProductsCreator = (products) => {
@@ -53,5 +54,38 @@ export const getProducts = () => {
             })
         })
         dispatch(getProductsCreator(data))
+    }
+}
+
+export const postPrescriptionCreator = (prescription) => {
+    return {
+        type : POST_PRESCRIPTION,
+        payload : prescription
+    }
+}
+
+export const setQRValue = (value) => {
+    return {
+        type : SET_QR_CODE,
+        payload : value
+    }
+}
+
+export const postPrescription = (prescription) => {
+    return async dispatch => {
+        const baseQuery =  `${REACT_APP_API_URL}/api/generate_prescription`
+        try {
+            const res = await axios({
+                method: 'post',
+                url: baseQuery,
+                data: prescription
+            })
+
+            console.log(res.data)
+            dispatch(setQRValue(res.data['prescription_id']))
+            dispatch(postPrescriptionCreator(prescription))
+        } catch (error) {
+            // fail
+        }
     }
 }

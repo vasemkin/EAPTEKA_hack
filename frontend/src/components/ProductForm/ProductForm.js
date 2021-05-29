@@ -4,7 +4,7 @@ import OneDrug from './OneDrug/OneDrug'
 import classes from './ProductForm.module.css'
 import { useDispatch } from 'react-redux'
 import makeid from '../../misc/makeid'
-import { addPrescribedProduct } from '../../store/actions/productActions'
+import { addPrescribedProduct, postPrescription } from '../../store/actions/productActions'
 
 const ProductForm = (props) => {
   const dispatch = useDispatch()
@@ -12,6 +12,10 @@ const ProductForm = (props) => {
   const addPrescriptionItem = () => {
     const id = makeid(4)
     dispatch(addPrescribedProduct({ key : id, data : {} }))
+  }
+
+  const submitPrescription = () => {
+    dispatch(postPrescription(props.products.prescribedProducts))
   }
 
   return(
@@ -30,7 +34,7 @@ const ProductForm = (props) => {
         })
       }
 
-      <Button type='submit'>Выписать</Button>
+      <Button onClick={submitPrescription}>Выписать</Button>
 
     </Form>
   )

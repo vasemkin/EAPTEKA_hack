@@ -1,10 +1,13 @@
 import { GET_PRODUCTS, PRODUCTS_FETCHING, 
-        ADD_PRESCRIBED_PRODUCT, DELETE_PRESCRIBED_PRODUCT, UPDATE_PRESCRIBED_PRODUCT } from '../actions/actionTypes';
+        ADD_PRESCRIBED_PRODUCT, DELETE_PRESCRIBED_PRODUCT, 
+        UPDATE_PRESCRIBED_PRODUCT, SET_QR_CODE, POST_PRESCRIPTION } from '../actions/actionTypes';
 
 const defaultStore = {
     products : [],
     productsFetching : true,
-    prescribedProducts : []
+    prescribedProducts : [],
+    issuedPrescriptions : [],
+    QRValue : null
 }
 
 export default function itemReducer(store = defaultStore, action) {
@@ -18,6 +21,22 @@ export default function itemReducer(store = defaultStore, action) {
                 products : action.payload,
                 productsFetching : false
             }
+        
+        case POST_PRESCRIPTION :
+
+            return {
+                ...store,
+                issuedPrescriptions : [...store.issuedPrescriptions, action.payload]
+            }
+        
+        
+        case SET_QR_CODE :
+
+            return {
+                ...store,
+                QRValue : action.payload
+            }
+            
         
         case PRODUCTS_FETCHING :
 
