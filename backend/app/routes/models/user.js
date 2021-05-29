@@ -10,6 +10,7 @@ const user = new Schema(
       prescriptions : [
         {
           prescription_id : { type: String, default : null },
+          names : { type: Array, default : [] },
           status : { type: String, default: 'PENDING' },
           edited : {
             isEdited : { type: Boolean, default: false },

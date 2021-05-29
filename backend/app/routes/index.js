@@ -5,6 +5,7 @@ const readFile = require('../../misc/readFile');
 const makeid = require('../../misc/makeid');
 const User = require("./models/user");
 const Products = require("./models/products");
+const Basket = require("./models/basket");
 const Property = require("./models/property");
 const Prescription = require("./models/prescription");
 const PropertyValues = require("./models/propertyValues");
@@ -93,24 +94,35 @@ const index = async function (app, db) {
             } else {
 
                 const user = result[0];
-                console.log(user);
-                user.prescriptions = 
-                    [...user.prescriptions, 
-                        {
-                            prescription_id : req.body.prescription_id,
-                            status : "PENDING",
-                            edited : {
-                                isEdited : false,
-                                newData : []
+
+                if (user.prescriptions.filter(e => e.prescription_id === req.body.prescription_id).length > 0) {
+
+                    res.json({
+                        "status" : "FAIL",
+                        "message" : "user already has that prescription"
+                    });
+
+                } else {
+
+                    user.prescriptions = 
+                        [...user.prescriptions, 
+                            {
+                                prescription_id : req.body.prescription_id,
+                                status : "PENDING",
+                                edited : {
+                                    isEdited : false,
+                                    newData : []
+                                }
                             }
-                        }
-                    ];
+                        ];
+    
+                    user.save()
+    
+                    res.json({
+                        "status" : "SUCCESS"
+                    });
 
-                user.save()
-
-                res.json({
-                    "status" : "SUCCESS"
-                });
+                }
 
             }
         })
@@ -262,7 +274,6 @@ const index = async function (app, db) {
 
     });
     
-
     app.get('/api/list_prescriptions', (req, res) => {
 
         Prescription.find({}, function(err, result) {
@@ -310,56 +321,74 @@ const index = async function (app, db) {
                     } else {
 
                         const multipleValues = multipleValuesResult[0]
-                        PropertyValues.find({ IBLOCK_ELEMENT_ID: product.ID }, async function(err, valuesResult) {
 
-                            if (err || !valuesResult.length) {
-        
+                        const product = result[0]
+                        Basket.findOne({ PRODUCT_ID: product.ID }, function(err, basketResult) {
+
+                            if (err || !basketResult) {
+
                                 res.json({
                                     "status" : "FAIL"
                                 })
-        
+
                             } else {
+
+                                const basket = basketResult;
+                                console.log(basket)
+
+                                PropertyValues.find({ IBLOCK_ELEMENT_ID: product.ID }, async function(err, valuesResult) {
+
+                                    if (err || !valuesResult.length) {
+                
+                                        res.json({
+                                            "status" : "FAIL"
+                                        })
+                
+                                    } else {
+                
+                                        const values = valuesResult[0]
+                                        let answer = { IBLOCK_ELEMENT_ID : product.ID }
         
-                                const values = valuesResult[0]
-                                let answer = { IBLOCK_ELEMENT_ID : product.ID }
-
-                                const prettify = async () => {
-
-                                    for (let value in values.toObject()) {
-                                        try {
-                                            const search = parseInt(value.split("_")[1])
-                                            await Property.find({ ID : search }, function(err, propertyResult) {
-                                                if(err) return
-    
+                                        const prettify = async () => {
+        
+                                            for (let value in values.toObject()) {
                                                 try {
-                                                    answer = {
-                                                        ...answer,
-                                                        [propertyResult[0].CODE]: values.toObject()[value]
-                                                    }
-                                                    
+                                                    const search = parseInt(value.split("_")[1])
+                                                    await Property.find({ ID : search }, function(err, propertyResult) {
+                                                        if(err) return
+            
+                                                        try {
+                                                            answer = {
+                                                                ...answer,
+                                                                [propertyResult[0].CODE]: values.toObject()[value]
+                                                            }
+                                                            
+                                                        } catch (error) {
+                                                            
+                                                        }
+        
+                                                    })
                                                 } catch (error) {
                                                     
                                                 }
-
-                                                console.log(answer)
-                                            })
-                                        } catch (error) {
-                                            
-                                        }
-                                    }
-
-                                }
-
-                                await prettify()
-
-                                res.json({
-                                    product : product,
-                                    multipleValues : multipleValues,
-                                    values : answer
-                                })
-                                
-                            }
+                                            }
         
+                                        }
+        
+                                        await prettify()
+        
+                                        res.json({
+                                            product : product,
+                                            multipleValues : multipleValues,
+                                            values : answer
+                                        })
+                                        
+                                    }
+                
+                                })
+                            
+                            }
+
                         })
 
                     }
@@ -368,6 +397,126 @@ const index = async function (app, db) {
 
             }
 
+        })
+
+    })
+
+    app.post('/api/edit_user_prescription', (req, res) => {
+
+        User.find({ uuid : req.body.uuid }, function(err, result) {
+
+            if (!result.length) {
+
+                res.json({
+                    "status" : "FAIL"
+                });
+
+            } else {
+
+                const user = result[0];
+
+                user.prescriptions.forEach((pres, index) => {
+
+                    if (pres.prescription_id === req.body.prescription_id) {
+                        user.prescriptions[index].isEdited = true;
+                        user.prescriptions[index].newData = req.body.data;
+                        user.save()
+                    }
+
+                })
+
+                res.json({
+                    "status" : "SUCCESS"
+                });
+
+            }
+        })
+
+    })
+
+    app.post('/api/name_single_prescription', (req, res) => {
+
+        User.find({ uuid : req.body.uuid }, function(err, result) {
+
+            if (!result.length) {
+
+                res.json({
+                    "status" : "FAIL"
+                });
+                return
+
+            } else {
+
+                const user = result[0];
+                user.prescriptions.forEach((pres, index) => {
+
+                    if (pres.prescription_id === req.body.prescription_id) {
+
+                        if (user.prescriptions[index].names.length === 0 ) {
+
+                            user.prescriptions[index].names = 
+                                [...user.prescriptions[index].names,
+                                    {
+                                        key : req.body.key_to_change,
+                                        name : req.body.new_name
+                                    }
+                                ]
+
+                            user.save()
+                                    
+                            res.json({
+                                "status" : "SUCCESS",
+                                "message" : "first item in [names]"
+                            });
+                            return
+
+                        } else {
+
+                            user.prescriptions[index].names.forEach((name, ind) => {
+                                
+                                if (name.key === req.body.key_to_change) {
+    
+                                    user.prescriptions[index].names[ind] = {
+                                        ...user.prescriptions[index].names[ind],
+                                        name : req.body.new_name
+                                    }
+
+                                    user.save()
+                                    
+                                    res.json({
+                                        "status" : "SUCCESS",
+                                        "message" : "changed existing item in [names]"
+                                    });
+                                    return
+
+                                } else {
+
+                                    user.prescriptions[index].names = 
+                                        [...user.prescriptions[index].names,
+                                            {
+                                                key : req.body.key_to_change,
+                                                name : req.body.new_name
+                                            }
+                                        ]
+        
+                                    user.save()
+                                    
+                                    res.json({
+                                        "status" : "SUCCESS",
+                                        "message" : "new item in [names]"
+                                    });
+                                    return
+
+                                }
+    
+                            })
+
+                        }
+
+                    } 
+                })
+
+            }
         })
 
     })
