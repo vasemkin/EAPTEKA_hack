@@ -77,6 +77,34 @@ const index = async function (app, db) {
         })
 
     });
+
+    app.post('/api/add_prescription_to_user', (req, res) => {
+
+        User.find({ uuid : req.body.uuid }, function(err, result) {
+
+            if (!result.length) {
+
+                res.json({
+                    "status" : "FAIL"
+                });
+
+
+            } else {
+
+                const user = result[0];
+                console.log(user);
+                user.prescriptions = [...user.prescriptions, req.body.prescription_id]
+
+                user.save()
+
+                res.json({
+                    "status" : "SUCCESS"
+                });
+
+            }
+        })
+
+    });
     
 
     app.post('/api/login', (req, res) => {
@@ -115,11 +143,10 @@ const index = async function (app, db) {
     app.post('/api/generate_prescription', (req, res) => {
 
         const id = makeid(4)
-
         console.log(req.body)
 
         const drugs = new Prescription({
-            id : id,
+            prescription_id : id,
             data : req.body
         });
 
@@ -158,6 +185,30 @@ const index = async function (app, db) {
                 });
 
             }
+        })
+
+    });
+    
+
+    app.get('/api/list_prescriptions', (req, res) => {
+
+        Prescription.find({}, function(err, result) {
+
+            if (err) {
+
+                res.json({
+                    "status" : "FAIL"
+                });
+
+            } else {
+
+                res.json({
+                    "data" : result
+                });
+                
+
+            }
+
         })
 
     });
