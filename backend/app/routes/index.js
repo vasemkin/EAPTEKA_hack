@@ -47,10 +47,6 @@ const index = async function (app, db) {
 
     app.post('/api/register', (req, res) => {
 
-        // schema:
-        // uuid: string
-        // type: string
-
         User.find({ uuid : req.body.uuid }, function(err, result) {
 
             if (!result.length) {
@@ -78,7 +74,38 @@ const index = async function (app, db) {
             }
         })
 
-          
+    });
+    
+
+    app.post('/api/login', (req, res) => {
+
+        User.find({ uuid : req.body.uuid }, function(err, result) {
+
+            if (!result.length) {
+
+                res.json({
+                    "status" : "FAIL"
+                });
+
+            } else {
+
+                if (result[0].password === req.body.password) {
+
+                    res.json({
+                        "status" : "SUCCESS",
+                        "type" : result[0].type
+                    });
+
+                } else {
+
+                    res.json({
+                        "status" : "FAIL"
+                    });
+
+                }
+
+            }
+        })
 
     });
       

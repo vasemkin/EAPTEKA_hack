@@ -6,12 +6,13 @@ const bodyParser = require('body-parser');
 const app = express();
 const readFile = require('./misc/readFile');
 const mongoose = require('mongoose')
+var cors = require('cors')
 const port = 8000;
 
 const config_path = path.join(appRoot.toString(), 'config', 'config.json');
 
 readFile(config_path).then(config => {
-
+  
   mongoose.Promise = global.Promise
 
   mongoose.connect(config.dbURI, 
@@ -24,6 +25,7 @@ readFile(config_path).then(config => {
     }
   )
   
+  app.use(cors())
 
   app.use(bodyParser.urlencoded({ extended: false }));
   // parse application/json
