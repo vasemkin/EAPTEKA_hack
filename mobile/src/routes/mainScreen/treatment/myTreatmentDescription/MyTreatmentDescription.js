@@ -14,17 +14,11 @@ export default class MyTreatmentDescription extends React.Component {
         return(
             <View style={TreatmentDescriptionStyle.container}>
                 <View style={TreatmentDescriptionStyle.headerView}>
-                    <View>
-                        <Text style={TreatmentDescriptionStyle.headerTitle}>
-                            {`Назначение№${this.myTreatment.id}`}
-                        </Text>
-                    </View>
-                    <View style={TreatmentDescriptionStyle.headerTextView}>
-                        <Text style={TreatmentDescriptionStyle.headerDate}>
-                            {`${this.myTreatment.date}`}
-                        </Text>
-                    </View>
+                    <Text style={TreatmentDescriptionStyle.headerTitle}>
+                        {`Назначение№${this.myTreatment.id}       ${this.myTreatment.date}`}
+                    </Text>
                 </View>
+
             </View>
         )
     }
@@ -38,21 +32,16 @@ const TreatmentDescriptionStyle = StyleSheet.create({
         width: '100%',
         height: '20%',
         backgroundColor: 'red',
-        justifyContent: 'space-between',
+        justifyContent: 'space-around',
         alignItems: 'center',
-        flexWrap: 'wrap',
-        flexDirection: 'row',
     },
     headerTextView: {
-        width: '33%',
+        width: '40%',
         backgroundColor: 'green',
         alignItems: 'center',
-        height: '100%'
+        height: '10%'
     },
     headerTitle: {
-        fontSize: RFValue(20, 580),
-    },
-    headerDate: {
         fontSize: RFValue(14, 580),
     },
 });
