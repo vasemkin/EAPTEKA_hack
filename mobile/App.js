@@ -5,6 +5,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginView from "./src/routes/loginView/LoginView";
 import MainMenuNavigator from "./src/routes/mainScreen/MainMenuNavigator";
 import MyTreatments from './src/routes/mainScreen/treatment/myTreatments/MyTreatments';
+import Reminders from './src/routes/mainScreen/reminders/Reminders';
+import SingleTreatments from './src/routes/mainScreen/reminders/SingleTreatments';
 import MyTreatmentDescription from './src/routes/mainScreen/treatment/myTreatmentDescription/MyTreatmentDescription';
 import {Feather} from '@expo/vector-icons';
 const Stack = createStackNavigator();
@@ -35,8 +37,47 @@ export default function App() {
                     )
                 })}
             />
-              <Stack.Screen name='MyTreatmentDescription'
-                            component={MyTreatmentDescription} options={{headerShown: false}}/>
+              <Stack.Screen 
+                name='MyTreatmentDescription'
+                component={MyTreatmentDescription} options={{headerShown: false}}
+              />
+
+              <Stack.Screen 
+                name='Reminders'
+                component={Reminders} 
+                options={({ navigation }) => ({
+                  title: 'Мои назначения',
+                  headerTitleStyle: {
+                      fontFamily: 'System',
+                      fontSize: RFValue(16, 580),
+                  },
+                  headerLeft: () => (
+                      <Feather name="chevron-left" size={40} color={'#7D69E8'}
+                               style={{marginLeft: 20}}
+                               onPress={() => navigation.goBack()}
+                      />
+                  )
+                })}
+                />
+
+                <Stack.Screen 
+                  name='SingleTreatments'
+                  component={SingleTreatments} 
+                  options={({ navigation }) => ({
+                    title: '',
+                    headerTitleStyle: {
+                        fontFamily: 'System',
+                        fontSize: RFValue(16, 580),
+                    },
+                    headerLeft: () => (
+                        <Feather name="chevron-left" size={40} color={'#7D69E8'}
+                                 style={{marginLeft: 20}}
+                                 onPress={() => navigation.goBack()}
+                        />
+                    )
+                  })}
+                  />
+
               {/*<Stack.Screen name="LoginView" component={LoginView} options={{headerShown: false}}/>*/}
           </Stack.Navigator>
       </NavigationContainer>
