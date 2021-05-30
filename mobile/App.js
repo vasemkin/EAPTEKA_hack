@@ -47,7 +47,7 @@ export default function App() {
                 name='Reminders'
                 component={Reminders} 
                 options={({ navigation }) => ({
-                  title: 'Мои назначения',
+                  title: 'Календарь приема',
                   headerTitleStyle: {
                       fontFamily: 'System',
                       fontSize: RFValue(16, 580),
