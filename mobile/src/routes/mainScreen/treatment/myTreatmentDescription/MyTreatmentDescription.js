@@ -44,7 +44,7 @@ export default class MyTreatmentDescription extends React.Component {
             <View style={TreatmentDescriptionStyle.container}>
                 <View style={TreatmentDescriptionStyle.headerView}>
                     <Text style={TreatmentDescriptionStyle.headerTitle}>
-                        {`Назначение№${this.myTreatment.id}       ${this.myTreatment.date}`}
+                        {`Назначение №${this.myTreatment.id}       ${this.myTreatment.date}`}
                     </Text>
                 </View>
                 <View style={TreatmentDescriptionStyle.qrViewStyle}>

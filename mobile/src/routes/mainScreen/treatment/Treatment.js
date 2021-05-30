@@ -28,8 +28,9 @@ export default class Treatment extends React.Component {
                 <View style={treatmentStyle.header}>
                     <Text style={treatmentStyle.headerText}>Назначения</Text>
                 </View>
-                {BUTTONS.map((item) => (
+                {BUTTONS.map((item, i) => (
                     <TouchableOpacity
+                        key={`button${i}`}
                         style={treatmentStyle.buttonStyle}
                         onPress={() => this.handleClick(item.route)}
                     >
