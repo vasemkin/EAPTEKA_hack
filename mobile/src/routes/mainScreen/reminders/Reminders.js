@@ -1,8 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 import {StyleSheet, View, CheckBox, Text, Image, TouchableOpacity, Modal, TextInput } from "react-native";
 import {LocaleConfig, WeekCalendar} from "react-native-calendars";
 import PencilIcon from '../../../assets/systemAssets/pencil.png';
 import CloseIcon from '../../../assets/systemAssets/close.png';
+import moment from "moment";
+
+const URL = 'http://d36062ec5b85.ngrok.io'
 
 LocaleConfig.locales['ru'] = {
     monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
@@ -16,6 +20,10 @@ LocaleConfig.defaultLocale = 'ru';
 const Reminders = (props) => {
 
     const [modalVisible, setModalVisible] = useState(false);
+
+    const [prescription, setPrescription] = useState({
+        prescription : {}
+    });
 
     const [calendar, setCalendar] = useState({
         selectedDay : null,
@@ -32,6 +40,43 @@ const Reminders = (props) => {
             }
         });
     }
+
+    const [pills, setPills] = useState({
+        // pill : {
+        //     data : [],
+        //     name : '',
+        //     dates : []
+        // }
+    })
+
+    useEffect(() => {
+
+        const logic = async () => {
+            const url = `${URL}/api/get_prescription`
+    
+            const res = await axios({
+                url : url,
+                method : 'POST',
+                data : {
+                    prescription_id : "pziG"
+                },
+                headers : {
+                    'Content-Type': 'application/json'
+                }
+            })
+
+            const pres = res.data
+            setPrescription({
+                prescription: pres
+            })
+
+            console.log(prescription)
+
+        }
+
+        logic()
+
+    }, [])
 
     return(
         <View style={styles.container}>

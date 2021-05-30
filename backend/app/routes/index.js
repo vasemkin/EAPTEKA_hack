@@ -158,7 +158,7 @@ const index = async function (app, db) {
 
     })
 
-    app.get('/api/user_prescriptions', (req, res) => {
+    app.post('/api/user_prescriptions', (req, res) => {
 
         User.find({ uuid : req.body.uuid }, function(err, result) {
 
@@ -252,7 +252,7 @@ const index = async function (app, db) {
 
     });
 
-    app.get('/api/get_prescription', (req, res) => {
+    app.post('/api/get_prescription', (req, res) => {
 
         Prescription.find({ prescription_id : req.body.prescription_id }, function(err, result) {
 
@@ -274,7 +274,7 @@ const index = async function (app, db) {
 
     });
     
-    app.get('/api/list_prescriptions', (req, res) => {
+    app.post('/api/list_prescriptions', (req, res) => {
 
         Prescription.find({}, function(err, result) {
 
@@ -297,7 +297,7 @@ const index = async function (app, db) {
 
     });
 
-    app.get('/api/product_data', (req, res) => {
+    app.post('/api/product_data', (req, res) => {
 
         Products.find({ ID: req.body.ID }, function(err, result){
 
