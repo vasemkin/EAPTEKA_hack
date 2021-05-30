@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios'
 import {StyleSheet, View, CheckBox, Text, Image, TouchableOpacity, Modal, TextInput } from "react-native";
 import {LocaleConfig, WeekCalendar} from "react-native-calendars";
@@ -20,10 +21,17 @@ LocaleConfig.defaultLocale = 'ru';
 const Reminders = (props) => {
 
     const [modalVisible, setModalVisible] = useState(false);
-
     const [prescription, setPrescription] = useState({
         prescription : {}
     });
+    
+    const [pills, setPills] = useState({
+        // pill : {
+        //     data : [],
+        //     name : '',
+        //     dates : []
+        // }
+    })
 
     const [calendar, setCalendar] = useState({
         selectedDay : null,
@@ -35,46 +43,91 @@ const Reminders = (props) => {
             ...calendar,
             selectedDay : day,
             markedDates : {
-                ...Object.values(calendar.markedDates).filter((item) => { return !item.userSelected }),
+                ...calendar.markedDates,
+                // ...Object.values(calendar.markedDates).filter((item) => { return !item.userSelected }),
                 [day.dateString] : {selected: true, marked: false, userSelected: true, selectedColor: '#7D69E8'}
             }
         });
     }
 
-    const [pills, setPills] = useState({
-        // pill : {
-        //     data : [],
-        //     name : '',
-        //     dates : []
-        // }
-    })
+    console.log(calendar)
 
     useEffect(() => {
+        const url = `${URL}/api/get_prescription`
 
-        const logic = async () => {
-            const url = `${URL}/api/get_prescription`
-    
-            const res = await axios({
-                url : url,
-                method : 'POST',
-                data : {
-                    prescription_id : "pziG"
-                },
-                headers : {
-                    'Content-Type': 'application/json'
-                }
-            })
+        axios({
+            url : url,
+            method : 'POST',
+            data : {
+                prescription_id : "SdDX"
+            },
+            headers : {
+                'Content-Type': 'application/json'
+            }
+        }).then((res) => {
+            const pres = res.data.data
 
-            const pres = res.data
             setPrescription({
                 prescription: pres
             })
+            
+            res.data.data.data.forEach((pill) => {
 
-            console.log(prescription)
+                let days = 4
 
-        }
+                switch (pill.frequency) {
+                    case 'ONE_DAY':
+                        days = 1
+                        break;
 
-        logic()
+                    case 'TWO_DAY':
+                        days = 1
+                        break;
+
+                    case 'ONE_WEEK':
+                        days = 7
+                        break;
+
+                    case 'TWO_WEEK':
+                        days = 4
+                        break;
+                
+                    default:
+                        break;
+                }
+
+                const issueDate = pill.data.issueDate;
+                const prettyDate = moment(issueDate.replace(/\./g, '-'), 'DD-MM-YYYY');
+                let dates = [prettyDate];
+                let formattedDates = {
+                    [moment(prettyDate).format('YYYY-MM-DD')] : {selected: true, marked: true, selectedColor: '#333333'}
+                };
+
+                [1,2,3,4,5,6].map((e, i) => {
+                    const tooTiredToThink = moment(dates[i], 'DD-MM-YYYY').add(days, 'days');
+                    dates = [...dates, tooTiredToThink];
+                    formattedDates = {
+                        ...formattedDates,
+                        [moment(tooTiredToThink).format('YYYY-MM-DD')] : {selected: true, marked: true, selectedColor: '#333333'}
+                    };
+                })
+
+                setPills({
+                    ...pills, 
+                    [pill.key] : { 
+                        pill : pill, 
+                        dates : dates,
+                        formattedDates : formattedDates
+                    }
+                })
+
+                setCalendar({
+                    ...calendar, 
+                    markedDates : formattedDates
+                })
+            })
+            
+        })
 
     }, [])
 

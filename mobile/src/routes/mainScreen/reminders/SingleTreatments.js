@@ -7,7 +7,6 @@ const SingleTreatments = (props) => {
     })
 
     const changeCards = () => {
-        console.log(status)
         status.status === 'PENDING' ? setStatus({ status : 'FINISHED'}) : setStatus({ status : 'PENDING'})
     }
 
