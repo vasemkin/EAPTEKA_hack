@@ -41,6 +41,7 @@ export default class MyTreatments extends React.Component {
                         <View style={myTreatmentStyle.flatList}>
                             {HEALING_COURSES.map((item, i) => (
                                 <TouchableWithoutFeedback
+                                    key={[`button${i}`]}
                                     onPress={() => this.handleClick(item)}
                                 >
                                     <View style={myTreatmentStyle.healingCourse}>
