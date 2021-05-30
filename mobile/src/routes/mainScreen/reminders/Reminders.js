@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
-import {StyleSheet, View, CheckBox, Text} from "react-native";
+import {StyleSheet, View, CheckBox, Text, Image, TouchableOpacity, Modal, TextInput } from "react-native";
 import {LocaleConfig, WeekCalendar} from "react-native-calendars";
+import PencilIcon from '../../../assets/systemAssets/pencil.png';
+import CloseIcon from '../../../assets/systemAssets/close.png';
 
 LocaleConfig.locales['ru'] = {
     monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
@@ -12,6 +14,8 @@ LocaleConfig.locales['ru'] = {
 LocaleConfig.defaultLocale = 'ru';
 
 const Reminders = (props) => {
+
+    const [modalVisible, setModalVisible] = useState(false);
 
     const [calendar, setCalendar] = useState({
         selectedDay : null,
@@ -32,9 +36,11 @@ const Reminders = (props) => {
     return(
         <View style={styles.container}>
             <View style={styles.field}>
-                <View style={styles.field__item}>
-                    <Text>Начать с</Text>
-                    <Text style={styles.field__text}>01.06.2021</Text>
+                <View style={[styles.field__item, styles.field__item_last]}>
+                    <Text>Название</Text>
+                    <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} >
+                        <Image style={styles.field__image} source={PencilIcon}/>
+                    </TouchableOpacity>
                 </View>
             </View>
 
@@ -66,6 +72,51 @@ const Reminders = (props) => {
                     <Text style={styles.checkbox__label}>19:00 Азитромицин (3 шт) </Text>
                 </View>
             </View>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                setModalVisible(!modalVisible);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <View style={styles.modal__header}>
+                            <View>
+                                <TouchableOpacity
+                                    style={styles.modal__close}
+                                    onPress={() => setModalVisible(!modalVisible)}
+                                >
+                                    <Image style={styles.modal__closeicon} source={CloseIcon}></Image>
+                                </TouchableOpacity>
+                            </View>
+                            
+                            <View>
+                                <Text style={styles.modal__title}>Название курса лечения</Text>
+                            </View>
+                        </View>
+                        
+                        <View style={styles.modal__content}>
+
+                            <Text style={styles.modal__sublabel}>Название</Text>
+                            <TextInput 
+                                placeholder="Название"
+                                style={styles.input}
+                            />
+                            <Text style={styles.modal__sublabel}>До 50 символов</Text>
+
+                        </View>
+
+                        <TouchableOpacity style={styles.button}>
+                            <Text style={styles.button__text}>Сохранить</Text>
+                        </TouchableOpacity>
+
+                    </View>
+                </View>
+            </Modal>
+
         </View>
     )
     
@@ -75,6 +126,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F7F7F7'
+    },
+
+    input: {
+        padding: 7,
+        borderWidth: 1,
+        borderRadius: 8,
+        borderColor: '#979797',
     },
 
     calendar: {
@@ -95,11 +153,17 @@ const styles = StyleSheet.create({
 
     field__item: {
         flexDirection: 'row',
+        alignItems: 'center',
         justifyContent: 'space-between',
         paddingTop: 10,
         paddingBottom: 10,
         borderBottomWidth: 1,
         borderColor: '#EAEAEA'
+    },
+
+    field__image: {
+        width: 24,
+        height: 24
     },
 
     field__item_last: {
@@ -128,6 +192,83 @@ const styles = StyleSheet.create({
         color: 'rgba(151, 151, 151, 1)'
     },
 
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        backgroundColor: 'rgba(0, 0, 0, 0.25)'
+    },
+
+    modalView: {
+        width: '80%',
+        alignSelf: 'center',
+        backgroundColor: "white",
+        borderRadius: 8,
+        padding: 18,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 2,
+            height: 2
+        },
+        shadowOpacity: 0.01,
+        shadowRadius: 1,
+        elevation: 2
+    },
+
+    buttonClose: {
+        backgroundColor: "#2196F3",
+    },
+
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center"
+    },
+
+    modal__header: {
+        justifyContent: "flex-start",
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 32,
+    },
+
+    modal__closeicon: {
+        marginRight: '8%',
+        width: 24,
+        height: 24
+    },
+
+    modal__title: {
+        fontWeight: "bold",
+        fontSize: 17
+    },
+
+    modal__sublabel: {
+        fontSize: 12,
+        marginLeft: 10,
+        color: 'rgba(151, 151, 151, 1)'
+    },
+
+    modal__content: {
+        marginBottom: 32
+    },
+
+    button: {
+        alignSelf: 'center',
+        width: '100%',
+        backgroundColor: '#7D69E8',
+        borderRadius: 100,
+        padding: 10,
+    },
+
+    button__text: {
+        color: '#FFFFFF',
+        alignSelf: 'center'
+    }
 
 });
 
