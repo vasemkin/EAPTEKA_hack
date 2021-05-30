@@ -1,6 +1,8 @@
-import * as React from 'react'
-import {StyleSheet, View, FlatList} from "react-native";
+import React, { useState } from 'react'
+import {StyleSheet, View, CheckBox, Text, Image, TouchableOpacity, Modal, TextInput } from "react-native";
 import {LocaleConfig, WeekCalendar} from "react-native-calendars";
+import PencilIcon from '../../../assets/systemAssets/pencil.png';
+import CloseIcon from '../../../assets/systemAssets/close.png';
 
 LocaleConfig.locales['ru'] = {
     monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
@@ -11,57 +13,263 @@ LocaleConfig.locales['ru'] = {
 };
 LocaleConfig.defaultLocale = 'ru';
 
-export default class Reminders extends React.Component {
-    constructor(props) {
-        super(props);
-        this.date = new Date().getDate(); //Current Date
-        this.month = new Date().getMonth() + 1; //Current Month
-        this.year = new Date().getFullYear(); //Current Year
-        this.state = {
-            currentDate: this.year + '/' + this.month + '/' + this.date,
-            markedDates: {}
-        }
-    }
-    handleClickCalendar (day) {
-        if (Object.keys(this.state.markedDates).length !== 0) {
-            for (let markedDate in this.state.markedDates) {
-                if (day.dateString === markedDate) {
-                    const newlist = Object.assign({}, this.state.markedDates);
-                    this.setState({markedDates: newlist});
-                } else {
-                    let newMarkedDate = {
-                        [`${day.dateString}`]: {selected: true, marked: true, selectedColor: 'purple'}
-                    }
-                    let newlist = Object.assign(this.state.markedDates, newMarkedDate);
-                    this.setState({markedDates: newlist});
-                }
-            }
-        } else {
-            let newMarkedDate = {
-                [`${day.dateString}`]: {selected: true, marked: true, selectedColor: 'purple'}
-            }
-            let newlist = Object.assign(this.state.markedDates, newMarkedDate);
-            this.setState({markedDates: newlist});
-        }
-    }
-    render(){
-        return(
-            <View style={reminderStyle.container}>
-                <WeekCalendar
-                    onDayPress={(day) => this.handleClickCalendar(day)}
-                    markedDates={this.state.markedDates}
-                />
-                <FlatList>
+const Reminders = (props) => {
 
-                </FlatList>
-            </View>
-        )
+    const [modalVisible, setModalVisible] = useState(false);
+
+    const [calendar, setCalendar] = useState({
+        selectedDay : null,
+        markedDates : {}
+    })
+
+    const handleDayPress = (day) => {
+        setCalendar({
+            ...calendar,
+            selectedDay : day,
+            markedDates : {
+                ...Object.values(calendar.markedDates).filter((item) => { return !item.userSelected }),
+                [day.dateString] : {selected: true, marked: false, userSelected: true, selectedColor: '#7D69E8'}
+            }
+        });
     }
+
+    return(
+        <View style={styles.container}>
+            <View style={styles.field}>
+                <View style={[styles.field__item, styles.field__item_last]}>
+                    <Text>Название</Text>
+                    <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} >
+                        <Image style={styles.field__image} source={PencilIcon}/>
+                    </TouchableOpacity>
+                </View>
+            </View>
+
+            <View style={styles.calendar}>
+                <Text style={styles.calendar__label}>Начало: 01.06.2021</Text>
+                <WeekCalendar
+                    markedDates={calendar.markedDates}
+                    renderHeader={(date) => {<Text>{date}</Text>}}
+                    onDayPress={(day) => {handleDayPress(day)}}
+                />
+            </View>
+
+            <View style={styles.card}>
+                <Text style={styles.card__subtitle}>Осталось: 14 дней</Text>
+                <View style={styles.checkbox__wrapper}>
+                    <CheckBox
+                        // value={isSelected}
+                        // onValueChange={setSelection}
+                        style={styles.checkbox}
+                    />
+                    <Text style={styles.checkbox__label}>10:00 Азитромицин (3 шт) </Text>
+                </View>
+                <View style={styles.checkbox__wrapper}>
+                    <CheckBox
+                        // value={isSelected}
+                        // onValueChange={setSelection}
+                        style={styles.checkbox}
+                    />
+                    <Text style={styles.checkbox__label}>19:00 Азитромицин (3 шт) </Text>
+                </View>
+            </View>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                setModalVisible(!modalVisible);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <View style={styles.modal__header}>
+                            <View>
+                                <TouchableOpacity
+                                    style={styles.modal__close}
+                                    onPress={() => setModalVisible(!modalVisible)}
+                                >
+                                    <Image style={styles.modal__closeicon} source={CloseIcon}></Image>
+                                </TouchableOpacity>
+                            </View>
+                            
+                            <View>
+                                <Text style={styles.modal__title}>Название курса лечения</Text>
+                            </View>
+                        </View>
+                        
+                        <View style={styles.modal__content}>
+
+                            <Text style={styles.modal__sublabel}>Название</Text>
+                            <TextInput 
+                                placeholder="Название"
+                                style={styles.input}
+                            />
+                            <Text style={styles.modal__sublabel}>До 50 символов</Text>
+
+                        </View>
+
+                        <TouchableOpacity style={styles.button}>
+                            <Text style={styles.button__text}>Сохранить</Text>
+                        </TouchableOpacity>
+
+                    </View>
+                </View>
+            </Modal>
+
+        </View>
+    )
+    
 }
 
-const reminderStyle = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginTop: 30
+        backgroundColor: '#F7F7F7'
+    },
+
+    input: {
+        padding: 7,
+        borderWidth: 1,
+        borderRadius: 8,
+        borderColor: '#979797',
+    },
+
+    calendar: {
+        marginTop: 20
+    },
+
+    calendar__label: {
+        paddingBottom: 10,
+        paddingLeft: 16,
+        color: 'rgba(151, 151, 151, 1)'
+    },
+
+    field: {
+        paddingRight: 16,
+        paddingLeft: 16,
+        backgroundColor: '#FFFFFF'
+    },
+
+    field__item: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingTop: 10,
+        paddingBottom: 10,
+        borderBottomWidth: 1,
+        borderColor: '#EAEAEA'
+    },
+
+    field__image: {
+        width: 24,
+        height: 24
+    },
+
+    field__item_last: {
+        borderBottomWidth: 0
+    },
+
+    checkbox__wrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16
+    },
+
+    checkbox__label: {
+        marginLeft: 11
+    },
+
+    card: {
+        marginTop: 24,
+        padding: 16,
+        backgroundColor: '#FFFFFF'
+    },
+
+    card__subtitle: {
+        marginBottom: 16,
+        fontSize: 15,
+        color: 'rgba(151, 151, 151, 1)'
+    },
+
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        backgroundColor: 'rgba(0, 0, 0, 0.25)'
+    },
+
+    modalView: {
+        width: '80%',
+        alignSelf: 'center',
+        backgroundColor: "white",
+        borderRadius: 8,
+        padding: 18,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 2,
+            height: 2
+        },
+        shadowOpacity: 0.01,
+        shadowRadius: 1,
+        elevation: 2
+    },
+
+    buttonClose: {
+        backgroundColor: "#2196F3",
+    },
+
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center"
+    },
+
+    modal__header: {
+        justifyContent: "flex-start",
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 32,
+    },
+
+    modal__closeicon: {
+        marginRight: '8%',
+        width: 24,
+        height: 24
+    },
+
+    modal__title: {
+        fontWeight: "bold",
+        fontSize: 17
+    },
+
+    modal__sublabel: {
+        fontSize: 12,
+        marginLeft: 10,
+        color: 'rgba(151, 151, 151, 1)'
+    },
+
+    modal__content: {
+        marginBottom: 32
+    },
+
+    button: {
+        alignSelf: 'center',
+        width: '100%',
+        backgroundColor: '#7D69E8',
+        borderRadius: 100,
+        padding: 10,
+    },
+
+    button__text: {
+        color: '#FFFFFF',
+        alignSelf: 'center'
     }
+
 });
+
+export default Reminders

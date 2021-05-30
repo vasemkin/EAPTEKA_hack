@@ -30,6 +30,12 @@ const SingleTreatments = (props) => {
 
             </View>
 
+            <View style={styles.card}>
+                <Text style={styles.card__heading}>Азитромицин таблетки</Text>
+                <Text style={styles.card__element}>Начало: 01.06.2021</Text>
+                <Text style={styles.card__element}>Осталось: 14 дней</Text>
+            </View>
+
         </View>
     )
 }
@@ -41,6 +47,24 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#FFFFFF'
+    },
+
+    card: {
+        padding : 20,
+        borderWidth: 1,
+        borderColor: '#D3D4FF',
+        borderRadius: 8
+    },
+
+    card__heading: {
+        fontWeight: 'bold', 
+        fontSize: 17,
+        marginBottom: 10
+    },
+
+    card__element: {
+        fontSize : 17,
+        marginBottom: 10
     },
     
     button__container: {

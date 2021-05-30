@@ -7,7 +7,7 @@ import TreatmentCalendarIcon from '../../../assets/systemAssets/treatment_calend
 
 const BUTTONS = [
     {title: 'Мои назначения', img: MyTreatmentsIcon, route: 'MyTreatments'},
-    {title: 'Добавить курс лечения', img: AddTreatmentsIcon, route: ''},
+    {title: 'Добавить курс лечения', img: AddTreatmentsIcon, route: 'Reminders'},
     {title: 'Календарь приема', img: TreatmentCalendarIcon, route: 'SingleTreatments'},
 ]
 export default class Treatment extends React.Component {
